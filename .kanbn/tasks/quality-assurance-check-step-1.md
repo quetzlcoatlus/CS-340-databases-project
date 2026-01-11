@@ -1,10 +1,10 @@
 ---
 created: 2026-01-11T06:26:45.610Z
-updated: 2026-01-11T06:26:45.607Z
-assigned: 'Alexander Jones'
+updated: 2026-01-11T12:42:38.531Z
+assigned: 'Allie Lane'
 progress: 0
 tags: []
-due: 2026-01-15T00:00:00.000Z
+due: 2026-01-13T00:00:00.000Z
 ---
 
 # Quality Assurance Check - Step 1

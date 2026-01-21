@@ -1,10 +1,11 @@
 ---
 created: 2026-01-11T06:32:35.577Z
-updated: 2026-01-11T06:32:35.573Z
+updated: 2026-01-21T02:45:59.837Z
 assigned: Both
 progress: 0
 tags: []
-due: 2026-01-20T00:00:00.000Z
+due: 2026-01-19T00:00:00.000Z
+started: 2026-01-21T02:45:59.837Z
 ---
 
 # Project Step 1 Review
@@ -15,5 +16,5 @@ Review Drafts by your classmates to learn from their successes and mistakes. Loo
 
 - [ ] Alexander Jones Review 1
 - [ ] Alexander Jones Review 2
-- [ ] Allie Lane Review 1
-- [ ] Allie Lane Review 2
+- [x] Allie Lane Review 1
+- [x] Allie Lane Review 2

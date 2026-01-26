@@ -13,9 +13,6 @@ completedColumns:
 
 ## In Progress
 
-- [project-step-1-review](tasks/project-step-1-review.md)
-- [project-step-1-final-version](tasks/project-step-1-final-version.md)
-
 ## Done
 
 - [form-group](tasks/form-group.md)
@@ -25,3 +22,5 @@ completedColumns:
 - [create-er-diagram](tasks/create-er-diagram.md)
 - [quality-assurance-check-step-1](tasks/quality-assurance-check-step-1.md)
 - [submit-project-step-1-to-ed-discussion](tasks/submit-project-step-1-to-ed-discussion.md)
+- [project-step-1-review](tasks/project-step-1-review.md)
+- [project-step-1-final-version](tasks/project-step-1-final-version.md)

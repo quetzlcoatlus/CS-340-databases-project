@@ -25,9 +25,9 @@ CREATE TABLE CrewMembers (
     firstName varchar(50) NOT NULL,
     lastName varchar(50) NOT NULL,
     rank varchar(10) NOT NULL,
-    usvID int(11) NOT NULL,
+    usvID int(11),
     PRIMARY KEY (crewMemberID),
-    FOREIGN KEY (usvID) REFERENCES USVs(usvID)
+    FOREIGN KEY (usvID) REFERENCES USVs(usvID) ON DELETE SET NULL
 );
 
 INSERT INTO CrewMembers (firstname, lastname, rank, usvID)
@@ -54,7 +54,7 @@ CREATE TABLE Missions (
     priorityLevel int(11) NOT NULL,
     usvID int(11),
     PRIMARY KEY (missionID),
-    FOREIGN KEY (usvID) REFERENCES USVs(usvID)
+    FOREIGN KEY (usvID) REFERENCES USVs(usvID) ON DELETE SET NULL
 );
 
 INSERT INTO Missions (title, location, priorityLevel, usvID)
@@ -70,7 +70,7 @@ CREATE TABLE Payloads (
     installedUSV int(11),
     installationDate DATE,
     PRIMARY KEY (payloadID),
-    FOREIGN KEY (installedUSV) REFERENCES USVs(usvID)
+    FOREIGN KEY (installedUSV) REFERENCES USVs(usvID) ON DELETE SET NULL
 );
 
 INSERT INTO Payloads (type, serialNumber, `condition`, installedUSV, installationDate)
@@ -97,12 +97,12 @@ VALUES ('USV Craft Master'),
 
 CREATE TABLE CrewMemberQualifications (
     crewMemberQualificationID int(11) NOT NULL AUTO_INCREMENT,
-    crewMemberID int(11) NOT NULL,
-    qualificationID int(11) NOT NULL,
+    crewMemberID int(11),
+    qualificationID int(11),
     earnedDate date NOT NULL,
     PRIMARY KEY (crewMemberQualificationID),
-    FOREIGN KEY (crewMemberID) REFERENCES CrewMembers(crewMemberID),
-    FOREIGN KEY (qualificationID) REFERENCES Qualifications(qualificationID)
+    FOREIGN KEY (crewMemberID) REFERENCES CrewMembers(crewMemberID) ON DELETE CASCADE,
+    FOREIGN KEY (qualificationID) REFERENCES Qualifications(qualificationID) ON DELETE CASCADE
 );
 
 INSERT INTO CrewMemberQualifications (crewMemberID, qualificationID, earnedDate)

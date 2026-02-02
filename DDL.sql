@@ -78,7 +78,7 @@ VALUES ('EW', 'SA-EW-26-001', 'Operable', (SELECT usvID FROM USVs WHERE name = '
 ('EW', 'SA-EW-26-002', 'Operable', (SELECT usvID FROM USVs WHERE name = 'Wraith'), '2026-01-12'),
 ('EW', 'SA-EW-26-003', 'Operable', (SELECT usvID FROM USVs WHERE name = 'Ghost'), '2025-12-20'),
 ('SONAR', 'DL2-SN-26-101', 'Operable', (SELECT usvID FROM USVs WHERE name = 'Sentinel'), '2025-05-31'),
-('SONAR', 'DL2-SN-26-102', 'Inoperable', (SELECT usvID FROM USVs WHERE name = 'Raider'), '2025-08-24'),
+('SONAR', 'DL2-SN-26-102', 'Inoperable', (SELECT usvID FROM USVs WHERE name = 'Striker'), '2025-10-15'),
 ('SONAR', 'DL2-SN-26-103', 'Operable', NULL, NULL),
 ('EO/IR', 'A7-HD-26-501', 'Inoperable', NULL, NULL),
 ('EO/IR', 'A7-HD-26-502', 'Operable', (SELECT usvID FROM USVs WHERE name = 'Sentinel'), '2025-05-31'),

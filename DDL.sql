@@ -66,7 +66,7 @@ CREATE TABLE Payloads (
     payloadID int(11) NOT NULL AUTO_INCREMENT,
     type varchar(50) NOT NULL,
     serialNumber varchar(50) NOT NULL,
-    condition varchar(25) NOT NULL,
+    `condition` varchar(25) NOT NULL,
     installedUSV int(11),
     installationDate DATE,
     PRIMARY KEY (payloadID),
@@ -86,7 +86,7 @@ VALUES ('EW', 'SA-EW-26-001', 'Operable', (SELECT usvID FROM USVs WHERE name = '
 
 CREATE TABLE Qualifications (
     qualificationID int(11) NOT NULL AUTO_INCREMENT,
-    name varchar(50) NOT NULL
+    name varchar(50) NOT NULL,
     PRIMARY KEY (qualificationID)
 );
 

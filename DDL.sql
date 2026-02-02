@@ -73,7 +73,7 @@ CREATE TABLE Payloads (
     FOREIGN KEY (installedUSV) REFERENCES USVs(usvID)
 );
 
-INSERT INTO Payloads (type, serialNumber, condition, installedUSV, installationDate)
+INSERT INTO Payloads (type, serialNumber, `condition`, installedUSV, installationDate)
 VALUES ('EW', 'SA-EW-26-001', 'Operable', (SELECT usvID FROM USVs WHERE name = 'Sentinel'), '2025-05-31'),
 ('EW', 'SA-EW-26-002', 'Operable', (SELECT usvID FROM USVs WHERE name = 'Wraith'), '2026-01-12'),
 ('EW', 'SA-EW-26-003', 'Operable', (SELECT usvID FROM USVs WHERE name = 'Ghost'), '2025-12-20'),

@@ -5,7 +5,7 @@
 SET FOREIGN_KEY_CHECKS=0;
 SET AUTOCOMMIT = 0;
 
-CREATE TABLE USVs (
+CREATE OR REPLACE TABLE USVs (
     usvID int(11) NOT NULL AUTO_INCREMENT,
     name varchar(50) NOT NULL,
     class varchar(50) NOT NULL,
@@ -20,7 +20,7 @@ VALUES ('Sentinel', 'MASC', 'Deployed'),
 ('Ghost', 'GARC', 'Deployed'),
 ('Raider', 'GARC', 'Maintenance');
 
-CREATE TABLE CrewMembers (
+CREATE OR REPLACE TABLE CrewMembers (
     crewMemberID int(11) NOT NULL AUTO_INCREMENT,
     firstName varchar(50) NOT NULL,
     lastName varchar(50) NOT NULL,
@@ -47,7 +47,7 @@ VALUES ('Marcus', 'Thorne', 'O-3', (SELECT usvID FROM USVs WHERE name = 'Sentine
 ('Aaron', 'Choi', 'RW1', (SELECT usvID FROM USVs WHERE name = 'Raider')),
 ('Ryan', 'Bennett', 'RW2', (SELECT usvID FROM USVs WHERE name = 'Raider'));
 
-CREATE TABLE Missions (
+CREATE OR REPLACE TABLE Missions (
     missionID int(11) NOT NULL AUTO_INCREMENT,
     title varchar(100) NOT NULL,
     location varchar(100) NOT NULL,
@@ -62,7 +62,7 @@ VALUES ('Silent Aegis', 'South China Sea', 8, (SELECT usvID FROM USVs WHERE name
 ('Swift Talon', 'Red Sea', 6, (SELECT usvID FROM USVs WHERE name = 'Wraith')),
 ('Pacific Watch', 'Hawaiian Islands', 5, (SELECT usvID FROM USVs WHERE name = 'Ghost'));
 
-CREATE TABLE Payloads (
+CREATE OR REPLACE TABLE Payloads (
     payloadID int(11) NOT NULL AUTO_INCREMENT,
     type varchar(50) NOT NULL,
     serialNumber varchar(50) NOT NULL,
@@ -84,7 +84,7 @@ VALUES ('EW', 'SA-EW-26-001', 'Operable', (SELECT usvID FROM USVs WHERE name = '
 ('EO/IR', 'A7-HD-26-502', 'Operable', (SELECT usvID FROM USVs WHERE name = 'Sentinel'), '2025-05-31'),
 ('EO/IR', 'A7-HD-26-503', 'Operable', (SELECT usvID FROM USVs WHERE name = 'Striker'), '2025-10-15');
 
-CREATE TABLE Qualifications (
+CREATE OR REPLACE TABLE Qualifications (
     qualificationID int(11) NOT NULL AUTO_INCREMENT,
     name varchar(50) NOT NULL,
     PRIMARY KEY (qualificationID)
@@ -95,7 +95,7 @@ VALUES ('USV Craft Master'),
 ('USV Supervisor'),
 ('USV Operator');
 
-CREATE TABLE CrewMemberQualifications (
+CREATE OR REPLACE TABLE CrewMemberQualifications (
     crewMemberQualificationID int(11) NOT NULL AUTO_INCREMENT,
     crewMemberID int(11),
     qualificationID int(11),

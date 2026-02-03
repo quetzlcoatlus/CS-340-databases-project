@@ -5,20 +5,47 @@
 SET FOREIGN_KEY_CHECKS=0;
 SET AUTOCOMMIT = 0;
 
+CREATE OR REPLACE TABLE Priorities (
+    priorityLevel int(11) NOT NULL AUTO_INCREMENT,
+    title varchar(25) NOT NULL,
+    PRIMARY KEY (priorityLevel)
+);
+
+INSERT INTO Priorities (title)
+VALUES ('Low'),
+('Medium'),
+('High');
+
+CREATE OR REPLACE TABLE Missions (
+    missionID int(11) NOT NULL AUTO_INCREMENT,
+    title varchar(100) NOT NULL,
+    location varchar(100) NOT NULL,
+    priorityLevel int(11) NOT NULL,
+    PRIMARY KEY (missionID),
+    FOREIGN KEY (priorityLevel) REFERENCES Priorities(priorityLevel)
+);
+
+INSERT INTO Missions (title, location, priorityLevel)
+VALUES ('Silent Aegis', 'South China Sea', (SELECT priorityLevel FROM Priorities WHERE title = 'High')),
+('Swift Talon', 'Red Sea', (SELECT priorityLevel FROM Priorities WHERE title = 'Low')),
+('Pacific Watch', 'Hawaiian Islands', (SELECT priorityLevel FROM Priorities WHERE title = 'Medium'));
+
 CREATE OR REPLACE TABLE USVs (
     usvID int(11) NOT NULL AUTO_INCREMENT,
     name varchar(50) NOT NULL,
     class varchar(50) NOT NULL,
     status varchar(25) NOT NULL,
-    PRIMARY KEY (usvID)
+    missionID int(11),
+    PRIMARY KEY (usvID),
+    FOREIGN KEY (missionID) REFERENCES Missions(missionID) ON DELETE SET NULL
 );
 
-INSERT INTO USVs (name, class, status)
-VALUES ('Sentinel', 'MASC', 'Deployed'),
-('Striker', 'MASC', 'Training'),
-('Wraith', 'GARC', 'Deployed'),
-('Ghost', 'GARC', 'Deployed'),
-('Raider', 'GARC', 'Maintenance');
+INSERT INTO USVs (name, class, status, missionID)
+VALUES ('Sentinel', 'MASC', 'Deployed', (SELECT missionID FROM Missions WHERE title = 'Silent Aegis')),
+('Striker', 'MASC', 'Training', NULL),
+('Wraith', 'GARC', 'Deployed', (SELECT missionID FROM Missions WHERE title = 'Pacific Watch')),
+('Ghost', 'GARC', 'Deployed', (SELECT missionID FROM Missions WHERE title = 'Pacific Watch')),
+('Raider', 'GARC', 'Maintenance', NULL);
 
 CREATE OR REPLACE TABLE CrewMembers (
     crewMemberID int(11) NOT NULL AUTO_INCREMENT,
@@ -46,21 +73,6 @@ VALUES ('Marcus', 'Thorne', 'O-3', (SELECT usvID FROM USVs WHERE name = 'Sentine
 ('Michael', 'Sterling', 'O-3', (SELECT usvID FROM USVs WHERE name = 'Raider')),
 ('Aaron', 'Choi', 'RW1', (SELECT usvID FROM USVs WHERE name = 'Raider')),
 ('Ryan', 'Bennett', 'RW2', (SELECT usvID FROM USVs WHERE name = 'Raider'));
-
-CREATE OR REPLACE TABLE Missions (
-    missionID int(11) NOT NULL AUTO_INCREMENT,
-    title varchar(100) NOT NULL,
-    location varchar(100) NOT NULL,
-    priorityLevel int(11) NOT NULL,
-    usvID int(11),
-    PRIMARY KEY (missionID),
-    FOREIGN KEY (usvID) REFERENCES USVs(usvID) ON DELETE SET NULL
-);
-
-INSERT INTO Missions (title, location, priorityLevel, usvID)
-VALUES ('Silent Aegis', 'South China Sea', 8, (SELECT usvID FROM USVs WHERE name = 'Sentinel')),
-('Swift Talon', 'Red Sea', 6, (SELECT usvID FROM USVs WHERE name = 'Wraith')),
-('Pacific Watch', 'Hawaiian Islands', 5, (SELECT usvID FROM USVs WHERE name = 'Ghost'));
 
 CREATE OR REPLACE TABLE Payloads (
     payloadID int(11) NOT NULL AUTO_INCREMENT,

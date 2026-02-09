@@ -1,8 +1,24 @@
 import React, { useState } from 'react';
 
 function PayloadsPage() {
-    const [payloads] = useState([]);
-    const [usvs] = useState([]);
+    const [payloads] = useState([
+        { payloadID: 1, type: 'EW', serialNumber: 'SA-EW-26-001', condition: 'Operable', installedUSV: 1, usvName: 'Sentinel', installationDate: '2025-05-31' },
+        { payloadID: 2, type: 'EW', serialNumber: 'SA-EW-26-002', condition: 'Operable', installedUSV: 3, usvName: 'Wraith', installationDate: '2026-01-12' },
+        { payloadID: 3, type: 'EW', serialNumber: 'SA-EW-26-003', condition: 'Operable', installedUSV: 4, usvName: 'Ghost', installationDate: '2025-12-20' },
+        { payloadID: 4, type: 'SONAR', serialNumber: 'DL2-SN-26-101', condition: 'Operable', installedUSV: 1, usvName: 'Sentinel', installationDate: '2025-05-31' },
+        { payloadID: 5, type: 'SONAR', serialNumber: 'DL2-SN-26-102', condition: 'Inoperable', installedUSV: 2, usvName: 'Striker', installationDate: '2025-10-15' },
+        { payloadID: 6, type: 'SONAR', serialNumber: 'DL2-SN-26-103', condition: 'Operable', installedUSV: null, usvName: 'Storage', installationDate: null },
+        { payloadID: 7, type: 'EO/IR', serialNumber: 'A7-HD-26-501', condition: 'Inoperable', installedUSV: null, usvName: 'Storage', installationDate: null },
+        { payloadID: 8, type: 'EO/IR', serialNumber: 'A7-HD-26-502', condition: 'Operable', installedUSV: 1, usvName: 'Sentinel', installationDate: '2025-05-31' },
+        { payloadID: 9, type: 'EO/IR', serialNumber: 'A7-HD-26-503', condition: 'Operable', installedUSV: 2, usvName: 'Striker', installationDate: '2025-10-15' }
+    ]);
+    const [usvs] = useState([
+        { usvID: 1, name: 'Sentinel' }, 
+        { usvID: 2, name: 'Striker' },
+        { usvID: 3, name: 'Wraith' }, 
+        { usvID: 4, name: 'Ghost' },
+        { usvID: 5, name: 'Raider' }
+    ]);
     const [formData, setFormData] = useState({
         type: '', serialNumber: '', condition: '', installedUSV: '', installationDate: ''
     });

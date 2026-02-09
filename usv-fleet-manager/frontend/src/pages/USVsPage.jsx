@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 
 function USVsPage() {
-    // Empty initial state
-    const [usvs] = useState([]);
-    const [missions] = useState([]); 
+    const [usvs] = useState([
+        { usvID: 1, name: 'Sentinel', class: 'MASC', status: 'Deployed', missionID: 1, missionTitle: 'Silent Aegis' },
+        { usvID: 2, name: 'Striker', class: 'MASC', status: 'Training', missionID: null, missionTitle: 'Unassigned' },
+        { usvID: 3, name: 'Wraith', class: 'GARC', status: 'Deployed', missionID: 3, missionTitle: 'Pacific Watch' },
+        { usvID: 4, name: 'Ghost', class: 'GARC', status: 'Deployed', missionID: 3, missionTitle: 'Pacific Watch' },
+        { usvID: 5, name: 'Raider', class: 'GARC', status: 'Maintenance', missionID: null, missionTitle: 'Unassigned' }
+    ]);
+    const [missions] = useState([
+        { missionID: 1, title: 'Silent Aegis' },
+        { missionID: 2, title: 'Swift Talon' },
+        { missionID: 3, title: 'Pacific Watch' }
+    ]); 
     
     // UI States
     const [editingUSV, setEditingUSV] = useState(null);

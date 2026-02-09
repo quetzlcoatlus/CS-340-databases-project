@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 
 function MissionsPage() {
-    const [missions] = useState([]);
+    const [missions] = useState([
+        { missionID: 1, title: 'Silent Aegis', location: 'South China Sea', priorityLevel: 3 },
+        { missionID: 2, title: 'Swift Talon', location: 'Red Sea', priorityLevel: 1 },
+        { missionID: 3, title: 'Pacific Watch', location: 'Hawaiian Islands', priorityLevel: 2 }
+    ]);
     const [formData, setFormData] = useState({ title: '', location: '', priorityLevel: '' });
 
     return (

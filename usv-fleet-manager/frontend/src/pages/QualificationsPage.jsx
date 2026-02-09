@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 
 function QualificationsPage() {
-    const [quals] = useState([]);
+    const [quals] = useState([
+        { qualificationID: 1, name: 'USV Craft Master' },
+        { qualificationID: 2, name: 'USV Supervisor' },
+        { qualificationID: 3, name: 'USV Operator' }
+    ]);
     const [formData, setFormData] = useState({ name: '' });
 
     return (

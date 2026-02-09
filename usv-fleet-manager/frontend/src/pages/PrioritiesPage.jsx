@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 
 function PrioritiesPage() {
-    const [priorities] = useState([]);
+    const [priorities] = useState([
+        { priorityLevel: 1, title: 'Low' },
+        { priorityLevel: 2, title: 'Medium' },
+        { priorityLevel: 3, title: 'High' }
+    ]);
 
     return (
         <div>

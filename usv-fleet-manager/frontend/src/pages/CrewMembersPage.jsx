@@ -1,8 +1,30 @@
 import React, { useState } from 'react';
 
 function CrewMembersPage() {
-    const [crew] = useState([]);
-    const [usvs] = useState([]);
+    const [crew] = useState([
+        { crewMemberID: 1, firstName: 'Marcus', lastName: 'Thorne', rank: 'O-3', usvID: 1, usvName: 'Sentinel' },
+        { crewMemberID: 2, firstName: 'Sarah', lastName: 'Jenkins', rank: 'RW1', usvID: 1, usvName: 'Sentinel' },
+        { crewMemberID: 3, firstName: 'Felipe', lastName: 'Torres', rank: 'ET2', usvID: 1, usvName: 'Sentinel' },
+        { crewMemberID: 4, firstName: 'Davis', lastName: 'Miller', rank: 'O-3', usvID: 2, usvName: 'Striker' },
+        { crewMemberID: 5, firstName: 'James', lastName: 'Shaw', rank: 'ET1', usvID: 2, usvName: 'Striker' },
+        { crewMemberID: 6, firstName: 'Maya', lastName: 'Rodriguez', rank: 'RW2', usvID: 2, usvName: 'Striker' },
+        { crewMemberID: 7, firstName: 'Christopher', lastName: 'Evans', rank: 'O-3', usvID: 3, usvName: 'Wraith' },
+        { crewMemberID: 8, firstName: 'Liam', lastName: 'Foster', rank: 'RW1', usvID: 3, usvName: 'Wraith' },
+        { crewMemberID: 9, firstName: 'Samantha', lastName: 'Reed', rank: 'RW2', usvID: 3, usvName: 'Wraith' },
+        { crewMemberID: 10, firstName: 'Hannah', lastName: 'White', rank: 'O-3', usvID: 4, usvName: 'Ghost' },
+        { crewMemberID: 11, firstName: 'Caleb', lastName: 'Wright', rank: 'ET1', usvID: 4, usvName: 'Ghost' },
+        { crewMemberID: 12, firstName: 'Sophia', lastName: 'Morales', rank: 'ET2', usvID: 4, usvName: 'Ghost' },
+        { crewMemberID: 13, firstName: 'Michael', lastName: 'Sterling', rank: 'O-3', usvID: 5, usvName: 'Raider' },
+        { crewMemberID: 14, firstName: 'Aaron', lastName: 'Choi', rank: 'RW1', usvID: 5, usvName: 'Raider' },
+        { crewMemberID: 15, firstName: 'Ryan', lastName: 'Bennett', rank: 'RW2', usvID: 5, usvName: 'Raider' }
+    ]);
+    const [usvs] = useState([
+        { usvID: 1, name: 'Sentinel' }, 
+        { usvID: 2, name: 'Striker' },
+        { usvID: 3, name: 'Wraith' }, 
+        { usvID: 4, name: 'Ghost' },
+        { usvID: 5, name: 'Raider' }
+    ]);
     const [formData, setFormData] = useState({ firstName: '', lastName: '', rank: '', usvID: '' });
 
     return (

@@ -1,4 +1,8 @@
--- USVs
+/*
+================================================================================
+Get_All, Add, Update, Delete, and Populate_Dropdown queries for USVs Page.
+================================================================================
+*/
 -- Get all USVs and their assigned Mission Titles for the List USVs table. (Uses a JOIN)
 SELECT 
     USVs.usvID AS 'ID', 
@@ -46,8 +50,11 @@ ORDER BY Missions.missionID;
 
 
 
--- Crew Members
---
+/*
+================================================================================
+Get_All, Add, Delete, and Populate_Dropdown queries for CrewMembers Page.
+================================================================================
+*/
 -- Get all Crew Members and their assigned USV Names for the List Crew table.
 SELECT 
     CrewMembers.crewMemberID AS 'ID', 
@@ -86,8 +93,11 @@ ORDER BY USVs.usvID;
 
 
 
--- Missions
---
+/*
+================================================================================
+Get_All, Add, and Populate_Dropdown queries for Missions Page.
+================================================================================
+*/
 -- Get all Missions for the List Missions table
 SELECT 
     Missions.missionID AS 'ID', 
@@ -119,8 +129,11 @@ ORDER BY Priorities.priorityLevel;
 
 
 
--- Payloads
--- 
+/*
+================================================================================
+Get_All, Add, Update, and Populate_Dropdown queries for Payloads Page.
+================================================================================
+*/
 -- Get all Payloads and their installed USV Names for the List Payloads table.
 SELECT 
     Payloads.payloadID AS 'ID', 
@@ -170,8 +183,12 @@ FROM USVs
 ORDER BY USVs.usvID;
 
 
--- Qualifications
--- 
+
+/*
+================================================================================
+Get_All, Add, and Delete queries for Payloads Page.
+================================================================================
+*/
 -- Get all Qualifications for the List Qualifications table
 SELECT 
     Qualifications.qualificationID AS 'ID', 
@@ -192,8 +209,11 @@ WHERE Qualifications.qualificationID = :qualification_id_selected;
 
 
 
--- Crew Member Qualifications
--- 
+/*
+================================================================================
+Get_All, Add, Delete, and Populate_Dropdown queries for Payloads Page.
+================================================================================
+*/
 -- Get all CrewQualifications with Crew Names and Qualification Names.
 SELECT 
     CrewMemberQualifications.crewMemberQualificationID AS 'ID',
@@ -217,7 +237,6 @@ INSERT INTO CrewMemberQualifications (
     --     CrewMembers.lastName = :crew_member_lname_from_dropdown
     -- ),
     :crew_member_id_from_dropdown,
-
     -- (SELECT qualificationID FROM Qualifications WHERE Qualifications.name = :qualification_name_from_dropdown),
     :qualification_id_from_dropdown,
     :earned_date_input
@@ -242,8 +261,12 @@ FROM Qualifications
 ORDER BY Qualifications.qualificationID;
 
 
--- Priorities
---
+
+/*
+================================================================================
+Get_All query for Priorities Page.
+================================================================================
+*/
 -- Get all Priorities for display
 SELECT 
     Priorities.priorityLevel AS 'ID', 

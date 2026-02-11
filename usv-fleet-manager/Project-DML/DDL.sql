@@ -1,9 +1,15 @@
--- Project Step 2 Draft for CS340 Oregon State University
--- Group Members: Alexander Jones & Alexander Lane
 -- DDL SQL Queries for USV Fleet Management Tool
+-- Group Members: Alexander Jones & Alexander Lane
+
 
 SET FOREIGN_KEY_CHECKS=0;
 SET AUTOCOMMIT = 0;
+
+/*
+================================================================================
+Create and Insert Statements for Priorities Table.
+================================================================================
+*/
 
 CREATE OR REPLACE TABLE Priorities (
     priorityLevel int(11) NOT NULL AUTO_INCREMENT,
@@ -15,6 +21,12 @@ INSERT INTO Priorities (title)
 VALUES ('Low'),
 ('Medium'),
 ('High');
+
+/*
+================================================================================
+Create and Insert Statements for Missions Table.
+================================================================================
+*/
 
 CREATE OR REPLACE TABLE Missions (
     missionID int(11) NOT NULL AUTO_INCREMENT,
@@ -29,6 +41,12 @@ INSERT INTO Missions (title, location, priorityLevel)
 VALUES ('Silent Aegis', 'South China Sea', (SELECT priorityLevel FROM Priorities WHERE title = 'High')),
 ('Swift Talon', 'Red Sea', (SELECT priorityLevel FROM Priorities WHERE title = 'Low')),
 ('Pacific Watch', 'Hawaiian Islands', (SELECT priorityLevel FROM Priorities WHERE title = 'Medium'));
+
+/*
+================================================================================
+Create and Insert Statements for USVs Table.
+================================================================================
+*/
 
 CREATE OR REPLACE TABLE USVs (
     usvID int(11) NOT NULL AUTO_INCREMENT,
@@ -47,6 +65,12 @@ VALUES ('Sentinel', 'MASC', 'Deployed', (SELECT missionID FROM Missions WHERE ti
 ('Ghost', 'GARC', 'Deployed', (SELECT missionID FROM Missions WHERE title = 'Pacific Watch')),
 ('Raider', 'GARC', 'Maintenance', NULL);
 
+/*
+================================================================================
+Create and Insert Statements for CrewMembers Table.
+================================================================================
+*/
+
 CREATE OR REPLACE TABLE CrewMembers (
     crewMemberID int(11) NOT NULL AUTO_INCREMENT,
     firstName varchar(50) NOT NULL,
@@ -57,7 +81,7 @@ CREATE OR REPLACE TABLE CrewMembers (
     FOREIGN KEY (usvID) REFERENCES USVs(usvID) ON DELETE SET NULL
 );
 
-INSERT INTO CrewMembers (firstname, lastname, rank, usvID)
+INSERT INTO CrewMembers (firstName, lastName, rank, usvID)
 VALUES ('Marcus', 'Thorne', 'O-3', (SELECT usvID FROM USVs WHERE name = 'Sentinel')),
 ('Sarah', 'Jenkins', 'RW1', (SELECT usvID FROM USVs WHERE name = 'Sentinel')),
 ('Felipe', 'Torres', 'ET2', (SELECT usvID FROM USVs WHERE name = 'Sentinel')),
@@ -73,6 +97,12 @@ VALUES ('Marcus', 'Thorne', 'O-3', (SELECT usvID FROM USVs WHERE name = 'Sentine
 ('Michael', 'Sterling', 'O-3', (SELECT usvID FROM USVs WHERE name = 'Raider')),
 ('Aaron', 'Choi', 'RW1', (SELECT usvID FROM USVs WHERE name = 'Raider')),
 ('Ryan', 'Bennett', 'RW2', (SELECT usvID FROM USVs WHERE name = 'Raider'));
+
+/*
+================================================================================
+Create and Insert Statements for Payloads Table.
+================================================================================
+*/
 
 CREATE OR REPLACE TABLE Payloads (
     payloadID int(11) NOT NULL AUTO_INCREMENT,
@@ -96,6 +126,12 @@ VALUES ('EW', 'SA-EW-26-001', 'Operable', (SELECT usvID FROM USVs WHERE name = '
 ('EO/IR', 'A7-HD-26-502', 'Operable', (SELECT usvID FROM USVs WHERE name = 'Sentinel'), '2025-05-31'),
 ('EO/IR', 'A7-HD-26-503', 'Operable', (SELECT usvID FROM USVs WHERE name = 'Striker'), '2025-10-15');
 
+/*
+================================================================================
+Create and Insert Statements for Qualifications Table.
+================================================================================
+*/
+
 CREATE OR REPLACE TABLE Qualifications (
     qualificationID int(11) NOT NULL AUTO_INCREMENT,
     name varchar(50) NOT NULL,
@@ -106,6 +142,12 @@ INSERT INTO Qualifications (name)
 VALUES ('USV Craft Master'),
 ('USV Supervisor'),
 ('USV Operator');
+
+/*
+================================================================================
+Create and Insert Statements for CrewMemberQualifications Table.
+================================================================================
+*/
 
 CREATE OR REPLACE TABLE CrewMemberQualifications (
     crewMemberQualificationID int(11) NOT NULL AUTO_INCREMENT,
@@ -119,111 +161,111 @@ CREATE OR REPLACE TABLE CrewMemberQualifications (
 
 INSERT INTO CrewMemberQualifications (crewMemberID, qualificationID, earnedDate)
 VALUES (
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Marcus' AND lastname = 'Thorne'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Marcus' AND lastName = 'Thorne'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Craft Master'),
     '2024-10-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Marcus' AND lastname = 'Thorne'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Marcus' AND lastName = 'Thorne'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Supervisor'),
     '2024-06-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Marcus' AND lastname = 'Thorne'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Marcus' AND lastName = 'Thorne'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Operator'),
     '2024-03-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Sarah' AND lastname = 'Jenkins'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Sarah' AND lastName = 'Jenkins'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Supervisor'),
     '2024-12-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Sarah' AND lastname = 'Jenkins'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Sarah' AND lastName = 'Jenkins'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Operator'),
     '2024-08-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Felipe' AND lastname = 'Torres'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Felipe' AND lastName = 'Torres'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Operator'),
     '2025-08-20'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Davis' AND lastname = 'Miller'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Davis' AND lastName = 'Miller'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Craft Master'),
     '2024-10-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Davis' AND lastname = 'Miller'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Davis' AND lastName = 'Miller'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Supervisor'),
     '2024-06-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Davis' AND lastname = 'Miller'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Davis' AND lastName = 'Miller'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Operator'),
     '2024-03-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'James' AND lastname = 'Shaw'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'James' AND lastName = 'Shaw'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Supervisor'),
     '2024-12-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'James' AND lastname = 'Shaw'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'James' AND lastName = 'Shaw'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Operator'),
     '2024-08-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Christopher' AND lastname = 'Evans'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Christopher' AND lastName = 'Evans'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Craft Master'),
     '2024-10-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Christopher' AND lastname = 'Evans'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Christopher' AND lastName = 'Evans'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Supervisor'),
     '2024-06-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Christopher' AND lastname = 'Evans'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Christopher' AND lastName = 'Evans'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Operator'),
     '2024-03-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Liam' AND lastname = 'Foster'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Liam' AND lastName = 'Foster'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Supervisor'),
     '2024-12-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Liam' AND lastname = 'Foster'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Liam' AND lastName = 'Foster'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Operator'),
     '2024-08-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Samantha' AND lastname = 'Reed'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Samantha' AND lastName = 'Reed'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Operator'),
     '2025-08-20'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Hannah' AND lastname = 'White'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Hannah' AND lastName = 'White'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Craft Master'),
     '2024-10-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Hannah' AND lastname = 'White'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Hannah' AND lastName = 'White'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Supervisor'),
     '2024-06-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Hannah' AND lastname = 'White'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Hannah' AND lastName = 'White'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Operator'),
     '2024-03-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Caleb' AND lastname = 'Wright'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Caleb' AND lastName = 'Wright'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Supervisor'),
     '2024-12-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Caleb' AND lastname = 'Wright'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Caleb' AND lastName = 'Wright'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Operator'),
     '2024-08-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Michael' AND lastname = 'Sterling'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Michael' AND lastName = 'Sterling'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Craft Master'),
     '2024-10-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Michael' AND lastname = 'Sterling'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Michael' AND lastName = 'Sterling'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Supervisor'),
     '2024-06-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Michael' AND lastname = 'Sterling'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Michael' AND lastName = 'Sterling'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Operator'),
     '2024-03-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Aaron' AND lastname = 'Choi'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Aaron' AND lastName = 'Choi'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Supervisor'),
     '2024-12-01'
 ),(
-    (SELECT crewMemberID FROM CrewMembers WHERE firstname = 'Aaron' AND lastname = 'Choi'), 
+    (SELECT crewMemberID FROM CrewMembers WHERE firstName = 'Aaron' AND lastName = 'Choi'), 
     (SELECT qualificationID FROM Qualifications WHERE name = 'USV Operator'),
     '2024-08-01'
 );

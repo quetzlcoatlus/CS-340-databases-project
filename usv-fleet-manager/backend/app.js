@@ -145,7 +145,6 @@ app.get('/api/qualifications', (req, res) => {
 });
 
 app.post('/api/qualifications', (req, res) => {
-    // DDL uses 'name', not 'qualificationName'
     const { name } = req.body;
     const query = `INSERT INTO Qualifications (name) VALUES (?)`;
     db.pool.query(query, [name], (err, result) => {
@@ -192,7 +191,6 @@ app.post('/api/crew-qualifications', (req, res) => {
 });
 
 app.delete('/api/crew-qualifications/:id', (req, res) => {
-    // Correct Table Name: CrewMemberQualifications
     const query = `DELETE FROM CrewMemberQualifications WHERE crewMemberQualificationID = ?`;
     db.pool.query(query, [req.params.id], (err, result) => {
         if (err) res.status(500).send(err);
@@ -210,6 +208,17 @@ app.get('/api/priorities', (req, res) => {
         if (err) res.status(500).send(err);
         else res.json(results);
     });
+});
+
+// =============================================================
+// SERVE STATIC FILES (Added for Deployment)
+// =============================================================
+// Serve the React frontend from the 'dist' directory
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Handle React Routing: Send all unhandled requests to index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 app.listen(PORT, () => {

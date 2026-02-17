@@ -5,3 +5,4 @@ logs/
 *.env
 dist/
 *.zip
+node_modules/

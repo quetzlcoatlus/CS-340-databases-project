@@ -1,4 +1,3 @@
-// frontend/src/pages/PayloadsPage.jsx
 import React, { useState, useEffect } from 'react';
 
 function PayloadsPage() {

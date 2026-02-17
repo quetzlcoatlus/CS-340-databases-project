@@ -1,4 +1,3 @@
-// frontend/src/pages/QualificationsPage.jsx
 import React, { useState, useEffect } from 'react';
 
 function QualificationsPage() {

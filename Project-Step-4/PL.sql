@@ -13,19 +13,119 @@ Get_All, Add, Update, Delete, and Populate_Dropdown procedures for USVs Page.
 ================================================================================
 */
 -- Get all USVs and their assigned Mission Titles for the List USVs table. (Uses a JOIN)
-
+DROP VIEW IF EXISTS v_usvs;
+CREATE VIEW v_usvs AS
+SELECT 
+    USVs.usvID AS 'ID', 
+    USVs.name AS 'NAME', 
+    USVs.class AS 'CLASS', 
+    USVs.status AS 'STATUS', 
+    IFNULL(Missions.title, 'Unassigned') AS 'MISSION'
+FROM USVs
+LEFT JOIN Missions ON USVs.missionID = Missions.missionID
+ORDER BY USVs.usvID;
 
 -- Adding a new USV, procedure that takes a name, class, status, and mission title/id (can be unassigned)
+DROP PROCEDURE IF EXISTS sp_create_usv;
+DELIMITER //
+CREATE PROCEDURE sp_create_usv(
+    IN p_name varchar(50),
+    IN p_class varchar(50),
+    IN p_status varchar(25),
+    IN p_missionID int(11)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Create error!' AS message;
+    END;
 
+    START TRANSACTION;
+
+    INSERT INTO USVs (name, class, status, missionID) 
+    VALUES (p_name, p_class, p_status, p_missionID);
+
+    IF ROW_COUNT() > 0 THEN
+        COMMIT;
+        SELECT 'USV created' AS message;
+    ELSE
+        ROLLBACK;
+        SELECT 'Nothing created' AS message;
+    END IF;
+END //
+DELIMITER ;
 
 -- Updating a USV, procedure that takes a name, class, status, and mission title/id (can be unassigned)
+DROP PROCEDURE IF EXISTS sp_update_usv;
+DELIMITER //
+CREATE PROCEDURE sp_update_usv(
+    IN p_usvID int(11),
+    IN p_name varchar(50),
+    IN p_class varchar(50),
+    IN p_status varchar(25),
+    IN p_missionID int(11)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Update error!' AS message;
+    END;
 
+    START TRANSACTION;
+
+    UPDATE USVs SET
+        name = p_name, 
+        class = p_class, 
+        status = p_status,
+        missionID = p_missionID
+    WHERE usvID = p_usvID;
+
+    IF ROW_COUNT() >= 0 THEN
+        COMMIT;
+        SELECT 'USV updated' AS message;
+    ELSE
+        ROLLBACK;
+        SELECT 'Nothing updated' AS message;
+    END IF;
+END //
+DELIMITER ;
 
 -- Delete a USV with given usvID
+DROP PROCEDURE IF EXISTS sp_delete_usv;
+DELIMITER //
+CREATE PROCEDURE sp_delete_usv(IN p_usvID int(11))
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Delete error!' AS message;
+    END;
 
+    START TRANSACTION;
+
+    DELETE FROM USVs
+    WHERE usvID = p_usvID;
+
+    IF ROW_COUNT() > 0 THEN
+        COMMIT;
+        SELECT 'USV deleted' AS message;
+    ELSE
+        ROLLBACK;
+        SELECT 'Nothing deleted' AS message;
+    END IF;
+END //
+DELIMITER ;
 
 -- Get all Missions to populate the "Current Mission" dropdown
-
+DROP VIEW IF EXISTS v_usv_missions_dropdown;
+CREATE VIEW v_usv_missions_dropdown AS
+SELECT 
+    Missions.missionID, 
+    Missions.title
+FROM Missions
+ORDER BY Missions.missionID;
 
 /*
 ================================================================================
@@ -151,13 +251,55 @@ Get_All, Add, and Populate_Dropdown procedures for Missions Page.
 ================================================================================
 */
 -- Get all Missions for the List Missions table
-
+DROP VIEW IF EXISTS v_missions;
+CREATE VIEW v_missions AS
+SELECT 
+    Missions.missionID AS 'ID', 
+    Missions.title AS 'TITLE', 
+    Missions.location AS 'LOCATION', 
+    Priorities.title AS 'PRIORITY'
+FROM Missions
+JOIN Priorities ON Missions.priorityLevel = Priorities.priorityLevel
+ORDER BY Missions.missionID;
 
 -- Add a new Mission, takes a title: str, location: str, and priorityLevel FK
+DROP PROCEDURE IF EXISTS sp_create_mission;
+DELIMITER //
+CREATE PROCEDURE sp_create_mission(
+    IN p_title varchar(100),
+    IN p_location varchar(100),
+    IN p_priorityLevel int(11)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Create error!' AS message;
+    END;
 
+    START TRANSACTION;
+
+    INSERT INTO Missions (title, location, priorityLevel) 
+    VALUES (p_title, p_location, p_priorityLevel);
+
+    IF ROW_COUNT() > 0 THEN
+        COMMIT;
+        SELECT 'Mission created' AS message;
+    ELSE
+        ROLLBACK;
+        SELECT 'Nothing created' AS message;
+    END IF;
+END //
+DELIMITER ;
 
 -- Get all Priorities to populate the "Priority Level" dropdown
-
+DROP VIEW IF EXISTS v_mission_priorities_dropdown;
+CREATE VIEW v_mission_priorities_dropdown AS
+SELECT 
+    Priorities.priorityLevel, 
+    Priorities.title
+FROM Priorities
+ORDER BY Priorities.priorityLevel;
 
 
 /*
@@ -167,16 +309,97 @@ Get_All, Add, Update, and Populate_Dropdown procedures for Payloads Page.
 ================================================================================
 */
 -- Get all Payloads and their installed USV Names for the List Payloads table.
-
+DROP VIEW IF EXISTS v_payloads;
+CREATE VIEW v_payloads AS
+SELECT 
+    Payloads.payloadID AS 'ID', 
+    Payloads.type AS 'TYPE', 
+    Payloads.serialNumber AS 'SERIAL', 
+    Payloads.condition AS 'CONDITION',
+    IFNULL(USVs.name, 'Storage') AS 'USV',
+    IFNULL(Payloads.installationDate, '') AS 'DATE INSTALLED'
+FROM Payloads
+LEFT JOIN USVs ON Payloads.installedUSV = USVs.usvID
+ORDER BY Payloads.payloadID;
 
 -- Add a new Payload, takes a type: str, serialNumber: str, condition: dropdown_str, installedUSV FK, installationDate: date
+DROP PROCEDURE IF EXISTS sp_create_payload;
+DELIMITER //
+CREATE PROCEDURE sp_create_payload(
+    IN p_type varchar(50),
+    IN p_serialNumber varchar(50),
+    IN p_condition varchar(25),
+    IN p_installedUSV int(11),
+    IN p_installationDate date
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Create error!' AS message;
+    END;
 
+    START TRANSACTION;
+
+    INSERT INTO Payloads (type, serialNumber, `condition`, installedUSV, installationDate) 
+    VALUES (p_type, p_serialNumber, p_condition, p_installedUSV, p_installationDate);
+
+    IF ROW_COUNT() > 0 THEN
+        COMMIT;
+        SELECT 'Payload created' AS message;
+    ELSE
+        ROLLBACK;
+        SELECT 'Nothing created' AS message;
+    END IF;
+END //
+DELIMITER ;
 
 -- Update an existing Payload
+DROP PROCEDURE IF EXISTS sp_update_payload;
+DELIMITER //
+CREATE PROCEDURE sp_update_payload(
+    IN p_payloadID int(11),
+    IN p_type varchar(50),
+    IN p_serialNumber varchar(50),
+    IN p_condition varchar(25),
+    IN p_installedUSV int(11),
+    IN p_installationDate date
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Update error!' AS message;
+    END;
 
+    START TRANSACTION;
+
+    UPDATE Payloads SET
+        type = p_type, 
+        serialNumber = p_serialNumber, 
+        `condition` = p_condition,
+        installedUSV = p_installedUSV,
+        installationDate = p_installationDate
+    WHERE payloadID = p_payloadID;
+
+    IF ROW_COUNT() >= 0 THEN
+        COMMIT;
+        SELECT 'Payload updated' AS message;
+    ELSE
+        ROLLBACK;
+        SELECT 'Nothing updated' AS message;
+    END IF;
+END //
+DELIMITER ;
 
 -- Get all USVs to populate the "Installed On" dropdown
-
+DROP VIEW IF EXISTS v_payload_usvs_dropdown;
+CREATE VIEW v_payload_usvs_dropdown AS
+SELECT 
+    USVs.usvID, 
+    USVs.name
+FROM USVs
+ORDER BY USVs.usvID;
 
 /*
 ================================================================================
@@ -288,4 +511,10 @@ Get_All procedure for Priorities Page.
 ================================================================================
 */
 -- Get all Priorities for display
-
+DROP VIEW IF EXISTS v_priorities;
+CREATE VIEW v_priorities AS
+SELECT 
+    Priorities.priorityLevel AS 'ID', 
+    Priorities.title AS 'TITLE'
+FROM Priorities
+ORDER BY Priorities.priorityLevel;

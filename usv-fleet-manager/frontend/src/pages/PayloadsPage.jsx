@@ -6,7 +6,7 @@ function PayloadsPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch('/api/payloads')
+        fetch('/api/payloads', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => {
                 // Formatting dates nicely for the table view
@@ -24,7 +24,7 @@ function PayloadsPage() {
             <div className="table-container">
                 
                 <div style={{ textAlign: 'center', marginBottom: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <h2 style={{ marginTop: 0, marginBottom: '15px', color: '#1a252f' }}>Equipment & Payloads</h2>
+                    <h2 style={{ marginTop: 0, marginBottom: '15px', color: '#1a252f' }}>Payloads</h2>
                     <button 
                         onClick={() => navigate('/payloads/add')} 
                         className="btn-submit" 
@@ -59,7 +59,7 @@ function PayloadsPage() {
                                     <button 
                                         className="btn-edit" 
                                         onClick={() => navigate(`/payloads/edit/${p.payloadID}`)}
-                                        style={{ margin: 0 }} // Removed margin since it's the only button
+                                        style={{ margin: 0 }}
                                     >
                                         Edit
                                     </button>

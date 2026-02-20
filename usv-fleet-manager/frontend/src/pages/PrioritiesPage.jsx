@@ -4,7 +4,7 @@ function PrioritiesPage() {
     const [priorities, setPriorities] = useState([]);
 
     useEffect(() => {
-        fetch('/api/priorities')
+        fetch('/api/priorities', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => setPriorities(data))
             .catch(err => console.error("Error fetching priorities:", err));

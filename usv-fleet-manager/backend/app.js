@@ -288,3 +288,20 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}...`);
 });
+
+// =============================================================
+// RESET DATABASE ROUTE
+// =============================================================
+app.post('/api/reset-database', (req, res) => {
+    const query = `CALL sp_load_usv_fleet_management_system_db();`;
+    
+    db.pool.query(query, (err, results) => {
+        if (err) {
+            console.error("Database Reset Error:", err);
+            res.status(500).send("Error resetting database.");
+        } else {
+            console.log("Database successfully reset to default state.");
+            res.sendStatus(200);
+        }
+    });
+});

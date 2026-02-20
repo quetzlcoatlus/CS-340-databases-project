@@ -6,7 +6,7 @@ function CrewMembersQualificationsPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch('/api/crew-qualifications')
+        fetch('/api/crew-qualifications', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => {
                 // Format the dates nicely for the table view

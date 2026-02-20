@@ -6,7 +6,7 @@ function QualificationsPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch('/api/qualifications')
+        fetch('/api/qualifications', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => setQualifications(data))
             .catch(err => console.error("Error fetching qualifications:", err));

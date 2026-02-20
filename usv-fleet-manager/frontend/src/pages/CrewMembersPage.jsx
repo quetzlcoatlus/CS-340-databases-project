@@ -6,7 +6,7 @@ function CrewMembersPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch('/api/crew')
+        fetch('/api/crew', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => setCrew(data))
             .catch(err => console.error("Error fetching crew:", err));

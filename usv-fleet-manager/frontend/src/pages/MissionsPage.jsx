@@ -6,7 +6,7 @@ function MissionsPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch('/api/missions')
+        fetch('/api/missions', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => setMissions(data))
             .catch(err => console.error("Error fetching missions:", err));

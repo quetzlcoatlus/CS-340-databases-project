@@ -17,12 +17,12 @@ function USVsPage() {
     });
 
     useEffect(() => {
-        fetch('/api/usvs')
+        fetch('/api/usvs', { cache: 'no-store' })
             .then(res => res.json())
             .then(data => setUSVs(data))
             .catch(err => console.error("Error fetching USVs:", err));
 
-        fetch('/api/missions') 
+        fetch('/api/missions', { cache: 'no-store' }) 
             .then(res => res.json())
             .then(data => setMissions(data))
             .catch(err => console.error("Error fetching Missions:", err));

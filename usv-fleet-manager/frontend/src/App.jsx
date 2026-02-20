@@ -19,6 +19,25 @@ import PrioritiesPage from './pages/PrioritiesPage';
 
 
 function App() {
+  // Function to handle the database reset
+  const handleResetDatabase = async () => {
+      if (window.confirm("WARNING: This will delete all current data and reset the database to its default state. Are you sure you want to proceed?")) {
+          try {
+              const response = await fetch('/api/reset-database', {
+                  method: 'POST'
+              });
+                
+              if (response.ok) {
+                  alert("Database reset successfully!");
+                  window.location.reload(); // Instantly reloads the page to show the reset data
+              } else {
+                  alert("Failed to reset database. Check console for errors.");
+              }
+          } catch (error) {
+              console.error("Error resetting database:", error);
+          }
+      }
+  };
   return (
     <div className="app">
       <Router>
@@ -28,15 +47,34 @@ function App() {
         </header>
 
         {/* Global Navigation Bar */}
-        <nav className="navbar">
-            <Link to="/">Home</Link>
-            <Link to="/usvs">USVs</Link>
-            <Link to="/crew">Crew Members</Link>
-            <Link to="/missions">Missions</Link>
-            <Link to="/payloads">Payloads</Link>
-            <Link to="/qualifications">Qualifications</Link>
-            <Link to="/crew-qualifications">Crew Qualifications</Link>
-            <Link to="/priorities">Priorities</Link>
+        <nav className="navbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    
+            {/* 1. Left Spacer (Acts as a counterweight to the button so the links stay true-center) */}
+            <div style={{ flex: 1 }}></div>
+
+            {/* 2. Center Links Container */}
+            <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+                <Link to="/">Home</Link>
+                <Link to="/usvs">USVs</Link>
+                <Link to="/crew">Crew Members</Link>
+                <Link to="/missions">Missions</Link>
+                <Link to="/payloads">Payloads</Link>
+                <Link to="/qualifications">Qualifications</Link>
+                <Link to="/crew-qualifications">Crew Qualifications</Link>
+                <Link to="/priorities">Priorities</Link>
+            </div>
+
+            {/* 3. Right Button Container */}
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                <button 
+                    onClick={handleResetDatabase} 
+                    className="btn-delete" 
+                    style={{ margin: 0, padding: '8px 16px', fontSize: '0.9rem' }}
+                >
+                    Reset Database
+                </button>
+            </div>
+    
         </nav>
 
         <main>

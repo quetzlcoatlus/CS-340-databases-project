@@ -57,7 +57,7 @@ function AddPayloadPage() {
                         <label>Condition</label>
                         <select name="condition" value={formData.condition} onChange={handleChange} required>
                             <option value="">Select Condition</option>
-                            <option value="Operational">Operational</option>
+                            <option value="Operable">Operable</option>
                             <option value="Inoperable">Inoperable</option>
                         </select>
                     </div>

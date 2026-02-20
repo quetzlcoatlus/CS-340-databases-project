@@ -1,81 +1,53 @@
-// frontend/src/pages/CrewMembersPage.jsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function CrewMembersPage() {
     const [crew, setCrew] = useState([]);
-    const [usvs, setUSVs] = useState([]);
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        rank: '',
-        usvID: ''
-    });
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetch('/api/crew')
             .then(res => res.json())
             .then(data => setCrew(data))
-            .catch(err => console.error(err));
-        
-        fetch('/api/usvs')
-            .then(res => res.json())
-            .then(data => setUSVs(data))
-            .catch(err => console.error(err));
+            .catch(err => console.error("Error fetching crew:", err));
     }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch('/api/crew', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-            if (response.status === 201) window.location.reload();
-        } catch (error) {
-            console.error(error);
+    const handleDelete = async (crewMemberID) => {
+        if (!window.confirm("Are you sure you want to delete this Crew Member?")) {
+            return;
         }
-    };
 
-    const handleDelete = async (id) => {
-        if(window.confirm("Delete this crew member?")) {
-            await fetch(`/api/crew/${id}`, { method: 'DELETE' });
-            setCrew(crew.filter(c => c.crewMemberID !== id));
+        try {
+            const response = await fetch(`/api/crew/${crewMemberID}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                // Remove the deleted member from the table instantly
+                setCrew(crew.filter(c => c.crewMemberID !== crewMemberID));
+            } else {
+                alert("Failed to delete the Crew Member.");
+            }
+        } catch (error) {
+            console.error("Error deleting crew member:", error);
         }
     };
 
     return (
-        <div>
-            <h2>Manage Crew Members</h2>
-            
-            <div className="form-container">
-                <h3>Add New Crew Member</h3>
-                <form onSubmit={handleSubmit}>
-                    <label>First Name: 
-                        <input type="text" onChange={e => setFormData({...formData, firstName: e.target.value})} required />
-                    </label>
-                    <label>Last Name: 
-                        <input type="text" onChange={e => setFormData({...formData, lastName: e.target.value})} required />
-                    </label>
-                    <label>Rank: 
-                        <input type="text" onChange={e => setFormData({...formData, rank: e.target.value})} required />
-                    </label>
-                    <label>Assigned USV: 
-                        <select onChange={e => setFormData({...formData, usvID: e.target.value})}>
-                            <option value="">Unassigned</option>
-                            {Array.isArray(usvs) && usvs.map(usv => (
-                                <option key={usv.usvID} value={usv.usvID}>
-                                    {usv.name}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-                    <button type="submit">Add Crew Member</button>
-                </form>
-            </div>
-
+        <div className="page-container">
             <div className="table-container">
-                <h3>Current Roster</h3>
+                
+                <div style={{ textAlign: 'center', marginBottom: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <h2 style={{ marginTop: 0, marginBottom: '15px', color: '#1a252f' }}>Crew Members</h2>
+                    <button 
+                        onClick={() => navigate('/crew/add')} 
+                        className="btn-submit" 
+                        style={{ width: 'max-content', padding: '10px 20px' }}
+                    >
+                        + Add Crew Member
+                    </button>
+                </div>
+
                 <table>
                     <thead>
                         <tr>
@@ -88,15 +60,21 @@ function CrewMembersPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.isArray(crew) && crew.map(member => (
-                            <tr key={member.crewMemberID}>
-                                <td>{member.crewMemberID}</td>
-                                <td>{member.firstName}</td>
-                                <td>{member.lastName}</td>
-                                <td>{member.rank}</td>
-                                <td>{member.usvName || "None"}</td>
+                        {crew.map(c => (
+                            <tr key={c.crewMemberID}>
+                                <td>{c.crewMemberID}</td>
+                                <td>{c.firstName}</td>
+                                <td>{c.lastName}</td>
+                                <td>{c.rank}</td>
+                                <td>{c.usvName}</td>
                                 <td>
-                                    <button className="delete-btn" onClick={() => handleDelete(member.crewMemberID)}>Delete</button>
+                                    {/* Edit Button can go here we you decide to add a PUT route later! */}
+                                    <button 
+                                        className="btn-delete" 
+                                        onClick={() => handleDelete(c.crewMemberID)}
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))}

@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 function PrioritiesPage() {
     const [priorities, setPriorities] = useState([]);
 
-    // 1. Fetch Data Only
     useEffect(() => {
         fetch('/api/priorities')
             .then(res => res.json())
@@ -12,20 +11,22 @@ function PrioritiesPage() {
     }, []);
 
     return (
-        <div>
-            <h2>Mission Priorities</h2>
-            <p>Reference Table: These values are standard and cannot be modified.</p>
-            
+        <div className="page-container">
             <div className="table-container">
+                
+                <div style={{ textAlign: 'center', marginBottom: '25px' }}>
+                    <h2 style={{ margin: 0, color: '#1a252f' }}>Priority Levels</h2>
+                </div>
+
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Title</th>
+                            <th>Level ID</th>
+                            <th>Priority Title</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.isArray(priorities) && priorities.map(p => (
+                        {priorities.map(p => (
                             <tr key={p.priorityLevel}>
                                 <td>{p.priorityLevel}</td>
                                 <td>{p.title}</td>

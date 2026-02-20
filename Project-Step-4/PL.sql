@@ -20,7 +20,8 @@ SELECT
     USVs.name AS 'NAME', 
     USVs.class AS 'CLASS', 
     USVs.status AS 'STATUS', 
-    IFNULL(Missions.title, 'Unassigned') AS 'MISSION'
+    IFNULL(Missions.title, 'Unassigned') AS 'MISSION',
+    USVs.missionID AS 'MISSION_ID'
 FROM USVs
 LEFT JOIN Missions ON USVs.missionID = Missions.missionID
 ORDER BY USVs.usvID;
@@ -38,7 +39,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SELECT 'Create error!' AS message;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -48,10 +49,10 @@ BEGIN
 
     IF ROW_COUNT() > 0 THEN
         COMMIT;
-        SELECT 'USV created' AS message;
+        SELECT LAST_INSERT_ID() AS newID;
     ELSE
         ROLLBACK;
-        SELECT 'Nothing created' AS message;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insert failed, no rows affected';
     END IF;
 END //
 DELIMITER ;
@@ -70,7 +71,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SELECT 'Update error!' AS message;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -82,12 +83,11 @@ BEGIN
         missionID = p_missionID
     WHERE usvID = p_usvID;
 
-    IF ROW_COUNT() >= 0 THEN
+    IF ROW_COUNT() > 0 THEN
         COMMIT;
-        SELECT 'USV updated' AS message;
     ELSE
         ROLLBACK;
-        SELECT 'Nothing updated' AS message;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Update failed, ID not found';
     END IF;
 END //
 DELIMITER ;
@@ -100,7 +100,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SELECT 'Delete error!' AS message;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -110,10 +110,9 @@ BEGIN
 
     IF ROW_COUNT() > 0 THEN
         COMMIT;
-        SELECT 'USV deleted' AS message;
     ELSE
         ROLLBACK;
-        SELECT 'Nothing deleted' AS message;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Delete failed, ID not found';
     END IF;
 END //
 DELIMITER ;
@@ -141,7 +140,8 @@ SELECT
     CrewMembers.firstName AS 'FIRST NAME', 
     CrewMembers.lastName AS 'LAST NAME', 
     CrewMembers.rank AS 'RANK', 
-    IFNULL(USVs.name, 'Unassigned') AS 'ASSIGNED USV'
+    IFNULL(USVs.name, 'Unassigned') AS 'ASSIGNED USV',
+    CrewMembers.usvID AS 'USV_ID'
 FROM CrewMembers
 LEFT JOIN USVs ON CrewMembers.usvID = USVs.usvID
 ORDER BY CrewMembers.crewMemberID;
@@ -167,7 +167,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SELECT 'Create error!' AS message;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -187,10 +187,10 @@ BEGIN
 
     IF ROW_COUNT() > 0 THEN
         COMMIT;
-        SELECT 'Crew member created' AS message;
+        SELECT LAST_INSERT_ID() AS newID;
     ELSE
         ROLLBACK;
-        SELECT 'Nothing created' AS message;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insert failed, no rows affected';
     END IF;
 END //
 
@@ -215,7 +215,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SELECT 'Delete error!' AS message;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -226,10 +226,9 @@ BEGIN
     -- Check if the DELETE was successful
     IF ROW_COUNT() > 0 THEN
         COMMIT;
-        SELECT 'Crew member deleted' AS message;
     ELSE
         ROLLBACK;
-        SELECT 'Nothing deleted' AS message;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Delete failed, ID not found';
     END IF;
 END //
 
@@ -257,7 +256,8 @@ SELECT
     Missions.missionID AS 'ID', 
     Missions.title AS 'TITLE', 
     Missions.location AS 'LOCATION', 
-    Priorities.title AS 'PRIORITY'
+    Priorities.title AS 'PRIORITY',
+    Missions.priorityLevel AS 'PRIORITY_ID'
 FROM Missions
 JOIN Priorities ON Missions.priorityLevel = Priorities.priorityLevel
 ORDER BY Missions.missionID;
@@ -274,7 +274,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SELECT 'Create error!' AS message;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -284,10 +284,10 @@ BEGIN
 
     IF ROW_COUNT() > 0 THEN
         COMMIT;
-        SELECT 'Mission created' AS message;
+        SELECT LAST_INSERT_ID() AS newID;
     ELSE
         ROLLBACK;
-        SELECT 'Nothing created' AS message;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insert failed, no rows affected';
     END IF;
 END //
 DELIMITER ;
@@ -317,7 +317,8 @@ SELECT
     Payloads.serialNumber AS 'SERIAL', 
     Payloads.condition AS 'CONDITION',
     IFNULL(USVs.name, 'Storage') AS 'USV',
-    IFNULL(Payloads.installationDate, '') AS 'DATE INSTALLED'
+    IFNULL(Payloads.installationDate, '') AS 'DATE INSTALLED',
+    Payloads.installedUSV AS 'USV_ID'
 FROM Payloads
 LEFT JOIN USVs ON Payloads.installedUSV = USVs.usvID
 ORDER BY Payloads.payloadID;
@@ -336,7 +337,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SELECT 'Create error!' AS message;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -346,10 +347,10 @@ BEGIN
 
     IF ROW_COUNT() > 0 THEN
         COMMIT;
-        SELECT 'Payload created' AS message;
+        SELECT LAST_INSERT_ID() AS newID;
     ELSE
         ROLLBACK;
-        SELECT 'Nothing created' AS message;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insert failed, no rows affected';
     END IF;
 END //
 DELIMITER ;
@@ -369,7 +370,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SELECT 'Update error!' AS message;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -382,12 +383,11 @@ BEGIN
         installationDate = p_installationDate
     WHERE payloadID = p_payloadID;
 
-    IF ROW_COUNT() >= 0 THEN
+    IF ROW_COUNT() > 0 THEN
         COMMIT;
-        SELECT 'Payload updated' AS message;
     ELSE
         ROLLBACK;
-        SELECT 'Nothing updated' AS message;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Update failed, ID not found';
     END IF;
 END //
 DELIMITER ;
@@ -428,7 +428,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SELECT 'Create error!' AS message;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -442,10 +442,10 @@ BEGIN
 
     IF ROW_COUNT() > 0 THEN
         COMMIT;
-        SELECT 'Qualification created' AS message;
+        SELECT LAST_INSERT_ID() AS newID;
     ELSE
         ROLLBACK;
-        SELECT 'Nothing created' AS message;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insert failed, no rows affected';
     END IF;
 END //
 
@@ -463,7 +463,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SELECT 'Delete error!' AS message;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -474,10 +474,9 @@ BEGIN
     -- Check if the DELETE was successful
     IF ROW_COUNT() > 0 THEN
         COMMIT;
-        SELECT 'Qualification deleted' AS message;
     ELSE
         ROLLBACK;
-        SELECT 'Nothing deleted' AS message;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Delete failed, ID not found';
     END IF;
 END //
 
@@ -519,7 +518,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SELECT 'Create error!' AS message;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -537,10 +536,10 @@ BEGIN
 
     IF ROW_COUNT() > 0 THEN
         COMMIT;
-        SELECT 'Crew member qualification created' AS message;
+        SELECT LAST_INSERT_ID() AS newID;
     ELSE
         ROLLBACK;
-        SELECT 'Nothing created' AS message;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insert failed, no rows affected';
     END IF;
 END //
 
@@ -558,7 +557,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SELECT 'Delete error!' AS message;
+        RESIGNAL;
     END;
 
     START TRANSACTION;
@@ -569,10 +568,9 @@ BEGIN
     -- Check if the DELETE was successful
     IF ROW_COUNT() > 0 THEN
         COMMIT;
-        SELECT 'Crew member qualification deleted' AS message;
     ELSE
         ROLLBACK;
-        SELECT 'Nothing deleted' AS message;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Delete failed, ID not found';
     END IF;
 END //
 

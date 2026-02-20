@@ -1,136 +1,84 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function CrewMemberQualificationsPage() {
-    const [assignments, setAssignments] = useState([]);
-    const [crew, setCrew] = useState([]);
-    const [quals, setQuals] = useState([]);
-    
-    const [formData, setFormData] = useState({ 
-        crewMemberID: '', 
-        qualificationID: '', 
-        earnedDate: '' 
-    });
+function CrewMembersQualificationsPage() {
+    const [crewQuals, setCrewQuals] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch the Intersection Table Data
         fetch('/api/crew-qualifications')
             .then(res => res.json())
-            .then(data => setAssignments(data))
-            .catch(err => console.error("Error fetching assignments:", err));
-
-        // Fetch Crew for Dropdown
-        fetch('/api/crew')
-            .then(res => res.json())
-            .then(data => setCrew(data))
-            .catch(err => console.error(err));
-
-        // Fetch Qualifications for Dropdown
-        fetch('/api/qualifications')
-            .then(res => res.json())
-            .then(data => setQuals(data))
-            .catch(err => console.error(err));
+            .then(data => {
+                // Format the dates nicely for the table view
+                const formattedData = data.map(cq => ({
+                    ...cq,
+                    earnedDate: cq.earnedDate ? cq.earnedDate.substring(0, 10) : 'N/A'
+                }));
+                setCrewQuals(formattedData);
+            })
+            .catch(err => console.error("Error fetching crew qualifications:", err));
     }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch('/api/crew-qualifications', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-            if (response.status === 201) {
-                window.location.reload();
-            } else {
-                alert("Failed to assign qualification.");
-            }
-        } catch (err) {
-            console.error(err);
+    const handleDelete = async (crewMemberQualificationID) => {
+        if (!window.confirm("Are you sure you want to remove this qualification from the crew member?")) {
+            return;
         }
-    };
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Remove this certification from the crew member?")) {
-            await fetch(`/api/crew-qualifications/${id}`, { method: 'DELETE' });
-            setAssignments(assignments.filter(a => a.crewMemberQualificationID !== id));
+        try {
+            const response = await fetch(`/api/crew-qualifications/${crewMemberQualificationID}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                setCrewQuals(crewQuals.filter(cq => cq.crewMemberQualificationID !== crewMemberQualificationID));
+            } else {
+                alert("Failed to remove Qualification.");
+            }
+        } catch (error) {
+            console.error("Error removing qualification:", error);
         }
     };
 
     return (
-        <div>
-            <h2>Crew Qualifications (M:M)</h2>
-            
-            <div className="form-container">
-                <h3>Assign Qualification</h3>
-                <form onSubmit={handleSubmit}>
-                    
-                    {/* Crew Dropdown */}
-                    <label>Crew Member: 
-                        <select 
-                            onChange={e => setFormData({...formData, crewMemberID: e.target.value})} 
-                            value={formData.crewMemberID}
-                            required
-                        >
-                            <option value="">Select Crew Member</option>
-                            {Array.isArray(crew) && crew.map(c => (
-                                <option key={c.crewMemberID} value={c.crewMemberID}>
-                                    {c.firstName} {c.lastName}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-
-                    {/* Qualification Dropdown */}
-                    <label>Qualification: 
-                        <select 
-                            onChange={e => setFormData({...formData, qualificationID: e.target.value})} 
-                            value={formData.qualificationID}
-                            required
-                        >
-                            <option value="">Select Qualification</option>
-                            {Array.isArray(quals) && quals.map(q => (
-                                <option key={q.qualificationID} value={q.qualificationID}>
-                                    {/* DDL uses 'name' for the qualification title */}
-                                    {q.name}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-
-                    {/* Date Input */}
-                    <label>Date Earned: 
-                        <input 
-                            type="date" 
-                            onChange={e => setFormData({...formData, earnedDate: e.target.value})} 
-                            value={formData.earnedDate}
-                            required 
-                        />
-                    </label>
-                    
-                    <button type="submit">Assign Certification</button>
-                </form>
-            </div>
-
+        <div className="page-container">
             <div className="table-container">
+                
+                <div style={{ textAlign: 'center', marginBottom: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <h2 style={{ marginTop: 0, marginBottom: '15px', color: '#1a252f' }}>Crew Member Qualifications</h2>
+                    <button 
+                        onClick={() => navigate('/crew-qualifications/add')} 
+                        className="btn-submit" 
+                        style={{ width: 'max-content', padding: '10px 20px' }}
+                    >
+                        + Assign Qualification
+                    </button>
+                </div>
+
                 <table>
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Crew Member</th>
-                            <th>Qualification</th>
+                            <th>Qualification Name</th>
                             <th>Date Earned</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.isArray(assignments) && assignments.map(a => (
-                            <tr key={a.crewMemberQualificationID}>
-                                <td>{a.crewMemberQualificationID}</td>
-                                <td>{a.firstName} {a.lastName}</td>
-                                <td>{a.qualificationName}</td>
-                                <td>{a.earnedDate ? a.earnedDate.split('T')[0] : "N/A"}</td>
+                        {crewQuals.map(cq => (
+                            <tr key={cq.crewMemberQualificationID}>
+                                <td>{cq.crewMemberQualificationID}</td>
+                                <td>{cq.crewName}</td> 
+                                <td>{cq.qualName}</td>
+                                <td>{cq.earnedDate}</td>
                                 <td>
-                                    <button className="delete-btn" onClick={() => handleDelete(a.crewMemberQualificationID)}>Remove</button>
+                                    <button 
+                                        className="btn-delete" 
+                                        onClick={() => handleDelete(cq.crewMemberQualificationID)}
+                                        style={{ margin: 0 }}
+                                    >
+                                        Remove
+                                    </button>
                                 </td>
                             </tr>
                         ))}
@@ -141,4 +89,4 @@ function CrewMemberQualificationsPage() {
     );
 }
 
-export default CrewMemberQualificationsPage;
+export default CrewMembersQualificationsPage;

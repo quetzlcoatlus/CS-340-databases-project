@@ -1,4 +1,3 @@
-// backend/app.js
 const express = require('express');
 const app = express();
 const db = require('./db-connector');
@@ -14,10 +13,16 @@ const PORT = 10067; // Port for OSU Server
 // ROUTES FOR USVs
 // =============================================================
 app.get('/api/usvs', (req, res) => {
+    // Alias the columns for React.
     const query = `
-        SELECT USVs.usvID, USVs.name, USVs.class, USVs.status, Missions.title as missionTitle, USVs.missionID
-        FROM USVs
-        LEFT JOIN Missions ON USVs.missionID = Missions.missionID;
+        SELECT 
+            ID AS usvID, 
+            NAME AS name, 
+            CLASS AS class, 
+            STATUS AS status, 
+            MISSION AS missionTitle, 
+            MISSION_ID AS missionID
+        FROM v_usvs;
     `;
     db.pool.query(query, (err, results) => {
         if (err) res.status(500).send(err);
@@ -28,7 +33,8 @@ app.get('/api/usvs', (req, res) => {
 app.post('/api/usvs', (req, res) => {
     const { name, class: className, status, missionID } = req.body;
     const mission = missionID === '' ? null : missionID;
-    const query = `INSERT INTO USVs (name, class, status, missionID) VALUES (?, ?, ?, ?)`;
+    
+    const query = `CALL sp_create_usv(?, ?, ?, ?)`;
     db.pool.query(query, [name, className, status, mission], (err, result) => {
         if (err) res.status(500).send(err);
         else res.status(201).send("USV Created");
@@ -36,7 +42,7 @@ app.post('/api/usvs', (req, res) => {
 });
 
 app.delete('/api/usvs/:id', (req, res) => {
-    const query = `DELETE FROM USVs WHERE usvID = ?`;
+    const query = `CALL sp_delete_usv(?)`;
     db.pool.query(query, [req.params.id], (err, result) => {
         if (err) res.status(500).send(err);
         else res.status(204).send();
@@ -47,8 +53,8 @@ app.put('/api/usvs/:id', (req, res) => {
     const { name, class: className, status, missionID } = req.body;
     const mission = missionID === '' ? null : missionID;
     
-    const query = `UPDATE USVs SET name = ?, class = ?, status = ?, missionID = ? WHERE usvID = ?`;
-    db.pool.query(query, [name, className, status, mission, req.params.id], (err, result) => {
+    const query = `CALL sp_update_usv(?, ?, ?, ?, ?)`;
+    db.pool.query(query, [req.params.id, name, className, status, mission], (err, result) => {
         if (err) res.status(500).send(err);
         else res.status(200).send("USV Updated");
     });
@@ -59,9 +65,14 @@ app.put('/api/usvs/:id', (req, res) => {
 // =============================================================
 app.get('/api/crew', (req, res) => {
     const query = `
-        SELECT CrewMembers.crewMemberID, CrewMembers.firstName, CrewMembers.lastName, CrewMembers.rank, USVs.name as usvName, CrewMembers.usvID
-        FROM CrewMembers
-        LEFT JOIN USVs ON CrewMembers.usvID = USVs.usvID;
+        SELECT 
+            ID AS crewMemberID, 
+            \`FIRST NAME\` AS firstName, 
+            \`LAST NAME\` AS lastName, 
+            RANK AS rank, 
+            \`ASSIGNED USV\` AS usvName,
+            USV_ID AS usvID
+        FROM v_crew_members;
     `;
     db.pool.query(query, (err, results) => {
         if (err) res.status(500).send(err);
@@ -72,7 +83,8 @@ app.get('/api/crew', (req, res) => {
 app.post('/api/crew', (req, res) => {
     const { firstName, lastName, rank, usvID } = req.body;
     const usv = usvID === '' ? null : usvID;
-    const query = `INSERT INTO CrewMembers (firstName, lastName, rank, usvID) VALUES (?, ?, ?, ?)`;
+    
+    const query = `CALL sp_create_crew_member(?, ?, ?, ?)`;
     db.pool.query(query, [firstName, lastName, rank, usv], (err, result) => {
         if (err) res.status(500).send(err);
         else res.status(201).send("Crew Member Added");
@@ -80,7 +92,7 @@ app.post('/api/crew', (req, res) => {
 });
 
 app.delete('/api/crew/:id', (req, res) => {
-    const query = `DELETE FROM CrewMembers WHERE crewMemberID = ?`;
+    const query = `CALL sp_delete_crew_member(?)`;
     db.pool.query(query, [req.params.id], (err, result) => {
         if (err) res.status(500).send(err);
         else res.status(204).send();
@@ -91,7 +103,15 @@ app.delete('/api/crew/:id', (req, res) => {
 // ROUTES FOR MISSIONS
 // =============================================================
 app.get('/api/missions', (req, res) => {
-    const query = `SELECT * FROM Missions`;
+    const query = `
+        SELECT 
+            ID AS missionID, 
+            TITLE AS title, 
+            LOCATION AS location, 
+            PRIORITY AS priorityTitle,
+            PRIORITY_ID AS priorityLevel
+        FROM v_missions;
+    `;
     db.pool.query(query, (err, results) => {
         if (err) res.status(500).send(err);
         else res.json(results);
@@ -100,7 +120,7 @@ app.get('/api/missions', (req, res) => {
 
 app.post('/api/missions', (req, res) => {
     const { title, location, priorityLevel } = req.body;
-    const query = `INSERT INTO Missions (title, location, priorityLevel) VALUES (?, ?, ?)`;
+    const query = `CALL sp_create_mission(?, ?, ?)`;
     db.pool.query(query, [title, location, priorityLevel], (err, result) => {
         if (err) res.status(500).send(err);
         else res.status(201).send("Mission Created");
@@ -112,13 +132,23 @@ app.post('/api/missions', (req, res) => {
 // =============================================================
 app.get('/api/payloads', (req, res) => {
     const query = `
-        SELECT Payloads.payloadID, Payloads.type, Payloads.serialNumber, Payloads.condition, USVs.name as usvName, Payloads.installedUSV, Payloads.installationDate
-        FROM Payloads
-        LEFT JOIN USVs ON Payloads.installedUSV = USVs.usvID;
+        SELECT 
+            ID AS payloadID, 
+            TYPE AS type, 
+            SERIAL AS serialNumber, 
+            \`CONDITION\` AS \`condition\`, 
+            USV AS usvName, 
+            \`DATE INSTALLED\` AS installationDate,
+            USV_ID AS installedUSV
+        FROM v_payloads;
     `;
     db.pool.query(query, (err, results) => {
-        if (err) res.status(500).send(err);
-        else res.json(results);
+        if (err) {
+            console.error("Payload Fetch Error:", err);
+            res.status(500).send(err);
+        } else {
+            res.json(results);
+        }
     });
 });
 
@@ -126,10 +156,23 @@ app.post('/api/payloads', (req, res) => {
     const { type, serialNumber, condition, installedUSV, installationDate } = req.body;
     const usv = installedUSV === '' ? null : installedUSV;
     const date = installationDate === '' ? null : installationDate;
-    const query = `INSERT INTO Payloads (type, serialNumber, \`condition\`, installedUSV, installationDate) VALUES (?, ?, ?, ?, ?)`;
+    
+    const query = `CALL sp_create_payload(?, ?, ?, ?, ?)`;
     db.pool.query(query, [type, serialNumber, condition, usv, date], (err, result) => {
         if (err) res.status(500).send(err);
         else res.status(201).send("Payload Added");
+    });
+});
+
+app.put('/api/payloads/:id', (req, res) => {
+    const { type, serialNumber, condition, installedUSV, installationDate } = req.body;
+    const usv = installedUSV === '' ? null : installedUSV;
+    const date = installationDate === '' ? null : installationDate;
+
+    const query = `CALL sp_update_payload(?, ?, ?, ?, ?, ?)`;
+    db.pool.query(query, [req.params.id, type, serialNumber, condition, usv, date], (err, result) => {
+        if (err) res.status(500).send(err);
+        else res.status(200).send("Payload Updated");
     });
 });
 
@@ -137,7 +180,12 @@ app.post('/api/payloads', (req, res) => {
 // ROUTES FOR QUALIFICATIONS
 // =============================================================
 app.get('/api/qualifications', (req, res) => {
-    const query = `SELECT * FROM Qualifications`;
+    const query = `
+        SELECT 
+            ID AS qualificationID, 
+            \`QUALIFICATION NAME\` AS name
+        FROM v_qualifications;
+    `;
     db.pool.query(query, (err, results) => {
         if (err) res.status(500).send(err);
         else res.json(results);
@@ -146,7 +194,7 @@ app.get('/api/qualifications', (req, res) => {
 
 app.post('/api/qualifications', (req, res) => {
     const { name } = req.body;
-    const query = `INSERT INTO Qualifications (name) VALUES (?)`;
+    const query = `CALL sp_create_qualification(?)`;
     db.pool.query(query, [name], (err, result) => {
         if (err) res.status(500).send(err);
         else res.status(201).send("Qualification Created");
@@ -154,7 +202,7 @@ app.post('/api/qualifications', (req, res) => {
 });
 
 app.delete('/api/qualifications/:id', (req, res) => {
-    const query = `DELETE FROM Qualifications WHERE qualificationID = ?`;
+    const query = `CALL sp_delete_qualification(?)`;
     db.pool.query(query, [req.params.id], (err, result) => {
         if (err) res.status(500).send(err);
         else res.status(204).send();
@@ -165,45 +213,61 @@ app.delete('/api/qualifications/:id', (req, res) => {
 // ROUTES FOR CREW MEMBER QUALIFICATIONS (Intersection Table)
 // =============================================================
 app.get('/api/crew-qualifications', (req, res) => {
-    // Table Name: CrewMemberQualifications
-    // PK: crewMemberQualificationID
-    // FK: crewMemberID
     const query = `
-        SELECT CMQ.crewMemberQualificationID, CM.firstName, CM.lastName, Q.name as qualificationName, CMQ.earnedDate
-        FROM CrewMemberQualifications CMQ
-        JOIN CrewMembers CM ON CMQ.crewMemberID = CM.crewMemberID
-        JOIN Qualifications Q ON CMQ.qualificationID = Q.qualificationID
-        ORDER BY CM.lastName, CM.firstName, Q.name;
+        SELECT 
+            \`ID\` AS crewMemberQualificationID, 
+            \`CREW MEMBER\` AS crewName, 
+            \`QUALIFICATION\` AS qualName, 
+            \`DATE EARNED\` AS earnedDate
+        FROM v_crew_member_qualifications;
     `;
     db.pool.query(query, (err, results) => {
-        if (err) res.status(500).send(err);
-        else res.json(results);
+        if (err) {
+            console.error("Fetch Error:", err);
+            res.status(500).send(err);
+        } else {
+            res.json(results);
+        }
     });
 });
 
 app.post('/api/crew-qualifications', (req, res) => {
     const { crewMemberID, qualificationID, earnedDate } = req.body;
-    const query = `INSERT INTO CrewMemberQualifications (crewMemberID, qualificationID, earnedDate) VALUES (?, ?, ?)`;
-    db.pool.query(query, [crewMemberID, qualificationID, earnedDate], (err, result) => {
-        if (err) res.status(500).send(err);
-        else res.status(201).send("Certification Assigned");
+    const query = `CALL sp_create_crew_member_qualification(?, ?, ?)`;
+    
+    db.pool.query(query, [crewMemberID, qualificationID, earnedDate], (err, results) => {
+        if (err) {
+            console.error("Insert Error:", err);
+            res.status(500).send(err);
+        } else {
+            res.sendStatus(201);
+        }
     });
 });
 
 app.delete('/api/crew-qualifications/:id', (req, res) => {
-    const query = `DELETE FROM CrewMemberQualifications WHERE crewMemberQualificationID = ?`;
-    db.pool.query(query, [req.params.id], (err, result) => {
-        if (err) res.status(500).send(err);
-        else res.status(204).send();
+    const id = req.params.id;
+    const query = `CALL sp_delete_crew_member_qualification(?)`;
+    
+    db.pool.query(query, [id], (err, results) => {
+        if (err) {
+            console.error("Delete Error:", err);
+            res.status(500).send(err);
+        } else {
+            res.sendStatus(204);
+        }
     });
 });
-
-
 // =============================================================
 // ROUTES FOR PRIORITIES (READ ONLY)
 // =============================================================
 app.get('/api/priorities', (req, res) => {
-    const query = `SELECT * FROM Priorities`;
+    const query = `
+        SELECT 
+            ID AS priorityLevel, 
+            TITLE AS title
+        FROM v_priorities;
+    `;
     db.pool.query(query, (err, results) => {
         if (err) res.status(500).send(err);
         else res.json(results);

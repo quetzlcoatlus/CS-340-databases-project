@@ -1,66 +1,53 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function QualificationsPage() {
-    const [quals, setQuals] = useState([]);
-    const [formData, setFormData] = useState({ qualificationName: '' });
+    const [qualifications, setQualifications] = useState([]);
+    const navigate = useNavigate();
 
-    // 1. Fetch Data
     useEffect(() => {
         fetch('/api/qualifications')
             .then(res => res.json())
-            .then(data => setQuals(data))
+            .then(data => setQualifications(data))
             .catch(err => console.error("Error fetching qualifications:", err));
     }, []);
 
-    // 2. Handle Submit
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch('/api/qualifications', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-            if (response.status === 201) {
-                window.location.reload();
-            } else {
-                alert("Failed to add qualification.");
-            }
-        } catch (err) {
-            console.error(err);
+    const handleDelete = async (qualificationID) => {
+        if (!window.confirm("Are you sure you want to delete this Qualification?")) {
+            return;
         }
-    };
 
-    // 3. Handle Delete
-    const handleDelete = async (id) => {
-        if (window.confirm("Delete this qualification?")) {
-            await fetch(`/api/qualifications/${id}`, { method: 'DELETE' });
-            setQuals(quals.filter(q => q.qualificationID !== id));
+        try {
+            const response = await fetch(`/api/qualifications/${qualificationID}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                // Remove the deleted qualification from the table instantly
+                setQualifications(qualifications.filter(q => q.qualificationID !== qualificationID));
+            } else {
+                alert("Failed to delete the Qualification.");
+            }
+        } catch (error) {
+            console.error("Error deleting qualification:", error);
         }
     };
 
     return (
-        <div>
-            <h2>Manage Qualifications</h2>
-            
-            <div className="form-container">
-                <h3>Add New Qualification</h3>
-                <form onSubmit={handleSubmit}>
-                    <label>Qualification Name: 
-                        <input 
-                            type="text" 
-                            value={formData.qualificationName} 
-                            onChange={e => setFormData({ qualificationName: e.target.value })} 
-                            required 
-                            placeholder="e.g. USV Operator"
-                        />
-                    </label>
-                    <button type="submit">Add Qualification</button>
-                </form>
-            </div>
-
+        <div className="page-container">
             <div className="table-container">
-                <h3>Available Qualifications</h3>
+                
+                <div style={{ textAlign: 'center', marginBottom: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <h2 style={{ marginTop: 0, marginBottom: '15px', color: '#1a252f' }}>Qualifications</h2>
+                    <button 
+                        onClick={() => navigate('/qualifications/add')} 
+                        className="btn-submit" 
+                        style={{ width: 'max-content', padding: '10px 20px' }}
+                    >
+                        + Add New Qualification
+                    </button>
+                </div>
+
                 <table>
                     <thead>
                         <tr>
@@ -70,12 +57,18 @@ function QualificationsPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.isArray(quals) && quals.map(q => (
+                        {qualifications.map(q => (
                             <tr key={q.qualificationID}>
                                 <td>{q.qualificationID}</td>
                                 <td>{q.name}</td>
                                 <td>
-                                    <button className="delete-btn" onClick={() => handleDelete(q.qualificationID)}>Delete</button>
+                                    <button 
+                                        className="btn-delete" 
+                                        onClick={() => handleDelete(q.qualificationID)}
+                                        style={{ margin: 0 }} /* Removed margin since it's the only button */
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))}

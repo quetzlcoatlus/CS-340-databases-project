@@ -99,7 +99,7 @@ input, select {
   padding: 10px 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  margin-top: 6px;
+  /* margin-top: 6px; */
   font-size: 1rem;
   background-color: white;
   color: #333;
@@ -337,4 +337,16 @@ footer {
 
 .btn-cancel:hover {
     background-color: #cbd5e0;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap; /* Added to prevent text from wrapping */
+    border: 0;
 }

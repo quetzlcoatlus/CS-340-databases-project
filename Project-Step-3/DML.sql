@@ -158,7 +158,7 @@ INSERT INTO Payloads (
     :serial_number_input, 
     :condition_from_dropdown, 
     -- (SELECT usvID FROM USVs WHERE USVs.name = :usv_name_from_dropdown)
-    :usv_id_from_dropdown
+    :usv_id_from_dropdown,
     :installation_date_input
 );
 
@@ -168,7 +168,7 @@ UPDATE Payloads SET
     Payloads.serialNumber = :serial_number_input, 
     Payloads.condition = :condition_from_dropdown,
     -- Payloads.installedUSV = (SELECT missionID FROM Missions WHERE Missions.title = :mission_title_from_dropdown),
-    Payloads.installedUSV = :mission_id_from_dropdown
+    Payloads.installedUSV = :mission_id_from_dropdown,
     -- Can be NULL
     
     Payloads.installationDate = :installation_date_input

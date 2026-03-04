@@ -238,7 +238,7 @@ INSERT INTO CrewMemberQualifications (
     -- (SELECT qualificationID FROM Qualifications WHERE Qualifications.name = :qualification_name_from_dropdown),
     :qualification_id_from_dropdown,
     :earned_date_input
-)
+);
 
 -- Remove a Qualification from a Crew Member
 DELETE FROM CrewMemberQualifications
